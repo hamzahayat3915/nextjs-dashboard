@@ -2,7 +2,8 @@ import { Revenue } from './definitions';
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://pja-admin-nest.9kwf3x.easypanel.host', // Set API base URL and avoid 3001 to prevent conflict
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://pja-admin-nest.9kwf3x.easypanel.host',
+  // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001',
   timeout: 10000, // Request timeout in ms
   headers: {
     'Content-Type': 'application/json',

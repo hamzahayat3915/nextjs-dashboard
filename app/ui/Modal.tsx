@@ -7,10 +7,16 @@ interface ModalProps {
   onConfirm?: () => void;
   initialData?: {
     name: string;
+    lastName: string;
+    middleInitial: string;
     phone: string;
-    isEmergency: boolean;
-    isVisibleToAll: boolean;
     address: string;
+    email: string;
+    court: string;
+    locale: string;
+    branch: string;
+    isVisibleToAll: boolean;
+    isEmergency: boolean;
   };
   message?: string;
 }
@@ -18,11 +24,25 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ title, onClose, onSubmit, onConfirm, initialData, message }) => {
   const [formData, setFormData] = useState(initialData || {
     name: '',
+    lastName: '',
+    middleInitial: '',
     phone: '',
-    isEmergency: false,
-    isVisibleToAll: false,
     address: '',
+    email: '',
+    court: '',
+    locale: '',
+    branch: '',
+    isVisibleToAll: false,
+    isEmergency: false,
   });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,76 +53,150 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, onSubmit, onConfirm, init
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md mx-4 transition-transform transform scale-100 hover:scale-105">
-        <h2 className="text-3xl font-semibold text-gray-800 mb-6 text-center">{title}</h2>
+      <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-2xl mx-4">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">{title}</h2>
+        
         {message ? (
           <p className="mb-4 text-gray-600 text-center">{message}</p>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6"> {/* Changed to space-y-6 for more space */}
-            <div>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Name"
-                className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-              />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Personal Info Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-1">First Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="First Name"
+                  className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  placeholder="Last Name"
+                  className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
-            <div>
-              <input
-                type="text"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="Phone"
-                className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-              />
+
+            {/* Contact Info Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-1">Middle Initial</label>
+                <input
+                  type="text"
+                  name="middleInitial"
+                  value={formData.middleInitial}
+                  onChange={handleChange}
+                  placeholder="Middle Initial"
+                  className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">Phone</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Phone"
+                  className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email"
+                  className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
+
+            {/* Address Field */}
             <div>
+              <label className="block text-gray-700 mb-1">Address</label>
               <input
                 type="text"
+                name="address"
                 value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                onChange={handleChange}
                 placeholder="Address"
-                className="border border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            {/* <div className="flex items-center mb-4">
-              <input
-                type="checkbox"
-                checked={formData.isEmergency}
-                onChange={(e) => setFormData({ ...formData, isEmergency: e.target.checked })}
-                className="mr-2"
-              />
-              <label className="text-gray-700 text-sm">Emergency Contact</label>
-            </div> */}
-            {/* <div className="flex items-center mb-4">
-              <input
-                type="checkbox"
-                checked={formData.isVisibleToAll}
-                onChange={(e) => setFormData({ ...formData, isVisibleToAll: e.target.checked })}
-                className="mr-2"
-              />
-              <label className="text-gray-700 text-sm">Visible to All</label>
-            </div> */}
+
+            {/* Court Info Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-1">Court</label>
+                <input
+                  type="text"
+                  name="court"
+                  value={formData.court}
+                  onChange={handleChange}
+                  placeholder="Court"
+                  className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">Locale</label>
+                <input
+                  type="text"
+                  name="locale"
+                  value={formData.locale}
+                  onChange={handleChange}
+                  placeholder="Locale"
+                  className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-1">Branch</label>
+                <input
+                  type="text"
+                  name="branch"
+                  value={formData.branch}
+                  onChange={handleChange}
+                  placeholder="Branch"
+                  className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+                
+
+            {/* Save Button */}
             <button 
               type="submit" 
-              className="w-full bg-blue-600 text-white rounded-md px-4 py-3 hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg"
+              className="w-full bg-blue-600 text-white rounded-lg px-4 py-3 hover:bg-blue-700 transition shadow-md"
             >
               Save
             </button>
           </form>
         )}
+
+        {/* Footer Buttons */}
         <div className="mt-6 flex justify-between">
           <button 
             onClick={onClose} 
-            className="text-gray-600 hover:text-gray-800 transition duration-200"
+            className="text-gray-600 hover:text-gray-800 transition"
           >
             Cancel
           </button>
           {onConfirm && (
             <button 
               onClick={onConfirm} 
-              className="text-red-600 hover:text-red-800 transition duration-200"
+              className="text-red-600 hover:text-red-800 transition"
             >
               Confirm Delete
             </button>

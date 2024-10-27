@@ -1,4 +1,4 @@
-'use client'; // Use this if you need client-side functionality, otherwise remove for SSR 
+'use client';
 import React, { useState } from 'react';
 import { apiRequest } from '@/app/lib/utils';
 
@@ -7,10 +7,10 @@ const UploadContacts: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    console.log(selectedFile, 'ss');
     if (selectedFile) {
       setFile(selectedFile);
       setError(null);
@@ -20,6 +20,7 @@ const UploadContacts: React.FC = () => {
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setIsDragging(false);
     const droppedFile = event.dataTransfer.files[0];
     if (droppedFile) {
       setFile(droppedFile);
@@ -30,6 +31,11 @@ const UploadContacts: React.FC = () => {
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -38,38 +44,35 @@ const UploadContacts: React.FC = () => {
       setError('Please select a file to upload.');
       return;
     }
-  
+
     setLoading(true);
     setError(null);
     setSuccess(null);
-  
+
     const formData = new FormData();
-    formData.append('file', file); // Ensure this matches what your backend expects
-  
-    const requestOptions: any = {
+    formData.append('file', file);
+
+    const requestOptions: RequestInit = {
       method: "POST",
       body: formData,
-      redirect: "follow",
     };
-  
+
     try {
-      const response = await fetch("http://localhost:3000/contacts/upload", requestOptions);
-  
-      // Check if the response is OK (status in the range 200-299)
+      const response = await fetch("https://pja-admin-nest.9kwf3x.easypanel.host/contacts/upload", requestOptions);
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
-      const result = await response.text(); // Handle the response as text
-      console.log(result); // Handle response data as needed
+
       setSuccess('File uploaded successfully!');
+      setFile(null);
     } catch (err: any) {
       setError('File upload failed. Please try again.');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-8">
@@ -79,8 +82,11 @@ const UploadContacts: React.FC = () => {
         </h2>
 
         <div
-          className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center transition bg-gray-50 hover:bg-gray-100"
-         
+          className={`border-2 ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'}
+            border-dashed p-6 rounded-lg text-center transition`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
         >
           <p className="text-gray-600">
             Drag & drop an Excel file here, or click to select one
@@ -90,7 +96,7 @@ const UploadContacts: React.FC = () => {
           </p>
           <input
             type="file"
-            // accept=".xls, .xlsx"
+            accept=".xls, .xlsx"
             onChange={handleFileChange}
             className="hidden"
             id="file-upload"
@@ -99,6 +105,13 @@ const UploadContacts: React.FC = () => {
             <span className="text-blue-500 underline">Click to select a file</span>
           </label>
         </div>
+
+        {file && (
+          <div className="mt-4 text-center text-gray-700">
+            <p className="font-medium">Attached File:</p>
+            <p className="text-sm text-gray-600">{file.name}</p>
+          </div>
+        )}
 
         <button
           onClick={handleSubmit}
