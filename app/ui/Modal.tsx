@@ -40,9 +40,15 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, onSubmit, onConfirm, init
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, files} = e.target;
+    if(files && name === 'file') {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'file' ? files[0] : value,
+      }));
+    }
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'file' ? files[0] : value,
+      [name]: value,
     }));
   };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
