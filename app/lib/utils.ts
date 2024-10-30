@@ -11,7 +11,6 @@ const axiosInstance = axios.create({
 });
 
 export const apiRequest = async (method: any, url: any, data: any = null, params = null) => {
-  debugger;
   try {
     const response = await axiosInstance({
       method,

@@ -34,16 +34,22 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, onSubmit, onConfirm, init
     branch: '',
     isVisibleToAll: false,
     isEmergency: false,
+    file: null,
   });
+  const [image, setImage] = useState<File | null>(null); // State for the image file
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, files} = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'file' ? files[0] : value,
     }));
   };
-
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]); // Update the image file state
+    }
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (onSubmit) {
@@ -171,6 +177,17 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, onSubmit, onConfirm, init
                   className="border border-gray-300 rounded-lg p-3 w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+                 {/* Image Upload Field */}
+          <div>
+            <label className="block text-gray-700">Profile Picture</label>
+            <input
+              type="file"
+              name="file"
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+              onChange={handleChange}
+              accept="image/*"
+            />
+          </div>
             </div>
 
                 

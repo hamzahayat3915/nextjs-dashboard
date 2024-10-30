@@ -14,6 +14,7 @@ const AddContact: React.FC = () => {
   const [branch, setBranch] = useState('');
   const [isVisibleToAll, setIsVisibleToAll] = useState(true);
   const [isEmergency, setIsEmergency] = useState(false);
+  const [image, setImage] = useState<File | null>(null); // State for the image file
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -29,21 +30,29 @@ const AddContact: React.FC = () => {
     }
 
     try {
-      const data = {
-        name,
-        lastName,
-        middleInitial,
-        phone,
-        address,
-        email,
-        court,
-        locale,
-        branch,
-        isVisibleToAll,
-        isEmergency,
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('lastName', lastName);
+      formData.append('middleInitial', middleInitial);
+      formData.append('phone', phone);
+      formData.append('address', address);
+      formData.append('email', email);
+      formData.append('court', court);
+      formData.append('locale', locale);
+      formData.append('branch', branch);
+      formData.append('isVisibleToAll', String(isVisibleToAll));
+      formData.append('isEmergency', String(isEmergency));
+      if (image) {
+        console.log('image', image);
+        formData.append('file', image); // Append the image file if selected
+      }
+      const requestOptions: RequestInit = {
+        method: "POST",
+        body: formData,
       };
-
-      await apiRequest('post', '/contacts/admin/add', data);
+  
+      // await apiRequest('post', '/contacts/admin/add', formData);
+      const response = await fetch("https://pja-admin-nest.9kwf3x.easypanel.host/contacts/admin/add", requestOptions);
 
       setSuccessMessage('Contact added successfully');
       setName('');
@@ -57,8 +66,15 @@ const AddContact: React.FC = () => {
       setBranch('');
       setIsVisibleToAll(true);
       setIsEmergency(false);
+      setImage(null);
     } catch (error) {
       setErrorMessage('An error occurred while adding the contact');
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]); // Update the image file state
     }
   };
 
@@ -180,8 +196,16 @@ const AddContact: React.FC = () => {
             </div>
           </div>
 
-          {/* Checkbox Fields */}
-        
+          {/* Image Upload Field */}
+          <div>
+            <label className="block text-gray-700">Profile Picture</label>
+            <input
+              type="file"
+              className="w-full p-2 mt-1 border border-gray-300 rounded"
+              onChange={handleImageChange}
+              accept="image/*"
+            />
+          </div>
 
           <button
             type="submit"
